@@ -87,12 +87,22 @@ def edit():
     
 
 
-@app.route('/top_expiring')
+@app.route('/recipe')
 def top_expiring():
     """Display the top 3 expiring foods."""
     foods = get_top_3_expiring_foods()
     print(foods)
-    return {'foods': foods}
+
+    if not foods:
+        return jsonify({'ERROR': 'no foods found'})
+    
+    food_names = [food[0] for food in foods]
+    prompt = "Give me 3 recipes with "+ ','.join(food_names)+" with their names, prep time and which kind of cuisines they are from."
+    return jsonify({
+        'prompt': prompt,
+        'foods' : food_names
+    });
+
 
 
 @app.route('/reset', methods=['POST'])

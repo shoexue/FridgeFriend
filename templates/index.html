@@ -49,6 +49,7 @@
         const capturedImage = document.getElementById('capturedImage');
         const sendBtn = document.getElementById('sendBtn');
         const foodNameInput = document.getElementById('foodName');
+        const recipeBtn = document.getElementById('recipeBtn');
 
         // Function to start video stream from the camera
         async function startCamera() {
@@ -106,14 +107,39 @@
             }
         }
 
+        async function makeRecipe(){
+            try{
+                const Recipe = await fetch('/recipe');
+                const preOutput = await Recipe.json();
+                console.log(preOutput);
+
+                if(preOutput.error){
+                    alert(preOutput.error);
+                    return;
+                }
+                const aiResponse = await fetch(`https://weathered-frog-de80.vaibhavpanchanadam.workers.dev/?prompt=${preOutput.prompt}`);
+                console.log(aiResponse);
+                const output = await aiResponse.json();
+                console.log(output);
+            }
+            catch(error){
+                console.log("Error generating recipe");
+            }
+        }
+
         // Start the camera when the page loads
         startCamera();
 
         // Set up the capture button to take the picture when clicked
         captureBtn.addEventListener('click', captureImage);
 
+        //
+        recipeBtn.addEventListener('click', makeRecipe);
+
         // Set up the send button to send the data when clicked
         sendBtn.addEventListener('click', sendData);
+
+
     </script>
 
     <h1>Food List with Random Numbers</h1>

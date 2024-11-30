@@ -79,7 +79,7 @@ def get_top_3_expiring_foods():
     cursor = conn.cursor()
 
     # Query to fetch the top 3 foods with the closest expiration dates, ordered by expiration_date
-    query = 'SELECT name, expiration_date FROM foods ORDER BY expiration_date ASC LIMIT 3'
+    query = 'SELECT name FROM foods ORDER BY expiration_date ASC LIMIT 3'
     cursor.execute(query)
     foods = cursor.fetchall()
     conn.close()
