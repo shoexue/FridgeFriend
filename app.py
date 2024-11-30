@@ -94,6 +94,33 @@ def top_expiring():
     print(foods)
     return {'foods': foods}
 
+
+@app.route('/reset', methods=['POST'])
+def reset_table():
+    """Drop and recreate the table through a POST request."""
+    print("Resetting the table...")
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    # Drop the table if it exists
+    cursor.execute('DROP TABLE IF EXISTS foods;')
+    
+    # Recreate the table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS foods (
+        id SERIAL PRIMARY KEY,
+        name TEXT,
+        when_added DATE DEFAULT CURRENT_DATE,
+        expiration_date TEXT
+    );
+    ''')
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({"message": "Table reset successfully!"}), 200
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 

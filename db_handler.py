@@ -85,3 +85,23 @@ def get_top_3_expiring_foods():
     conn.close()
     
     return foods
+
+def edit_food_expiration(name, new_expiration_date):
+    """Update the expiration date of a food item in the database."""
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    # Update the expiration_date for the given food name
+    cursor.execute(
+        'UPDATE foods SET expiration_date = %s WHERE name = %s',
+        (new_expiration_date, name)
+    )
+    
+    # Check if any rows were affected
+    if cursor.rowcount == 0:
+        print(f"No food item found with name: {name}")
+    else:
+        print(f"Expiration date for '{name}' updated to {new_expiration_date}")
+    
+    conn.commit()
+    conn.close()
