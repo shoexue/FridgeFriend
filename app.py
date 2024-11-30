@@ -98,10 +98,15 @@ def top_expiring():
     
     food_names = [food[0] for food in foods]
     prompt = "Give me 3 recipes with "+ ','.join(food_names)+" with their names, prep time and which kind of cuisines they are from."
-    return jsonify({
+    
+
+    response = jsonify({
         'prompt': prompt,
         'foods' : food_names
-    });
+    })
+    response.headers['Content-Type'] = 'application/json'
+
+    return response
 
 
 

@@ -121,6 +121,7 @@
                 console.log(aiResponse);
                 const output = await aiResponse.json();
                 console.log(output);
+                console.log(output.response);
             }
             catch(error){
                 console.log("Error generating recipe");

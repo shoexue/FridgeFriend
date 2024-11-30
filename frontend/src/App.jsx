@@ -4,6 +4,7 @@ import './app.css'
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import Home from './components/homepage/Home';
+import Recipes from './components/inventory/components/Recipes';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -13,7 +14,7 @@ function App() {
 		<Routes>
 			<Route path="/login" element={<Login />}/>
 			<Route path="/signup" element={<Signup />}/>
-			<Route path = "/" element={<Home />}/>
+			<Route path = "/" element={<Recipes />}/>
 		</Routes>
 	</BrowserRouter>
   )
