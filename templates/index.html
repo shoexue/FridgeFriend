@@ -121,14 +121,18 @@
         <thead>
             <tr>
                 <th>Food</th>
-                <th>Random Number</th>
+                <th>Date</th>
+                <th> Expiration</th>
+
             </tr>
         </thead>
         <tbody>
-            {% for food, random_number in foods %}
+            {% for food, date, expiration in foods %}
                 <tr>
                     <td>{{ food }}</td>
-                    <td>{{ random_number }}</td>
+                    <td>{{ date }}</td>
+                    <td>{{ expiration }}</td>
+
                 </tr>
             {% endfor %}
         </tbody>
