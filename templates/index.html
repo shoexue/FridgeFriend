@@ -33,6 +33,14 @@
         <button type="button" id="sendBtn">Send</button>
     </form>
 
+
+    <h3>Sort Food List</h3>
+    <label for="sortBy">Sort By:</label>
+    <select id="sortBy" onchange="window.location.href = '/?sort_by=' + this.value">
+        <option value="date_added" {% if sort_by == 'date_added' %}selected{% endif %}>Date Added</option>
+        <option value="expiration_date" {% if sort_by == 'expiration_date' %}selected{% endif %}>Expiration Date</option>
+    </select>
+
     <script>
         // Access the camera and stream the video feed
         const video = document.getElementById('video');
