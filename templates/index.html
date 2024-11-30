@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food List</title>
+</head>
+<body>
+
+    <h2>Capture Image from Camera</h2>
+
+    <!-- Video element to display live camera feed -->
+    <video id="video" width="640" height="480" autoplay></video>
+    
+    <!-- Canvas element to capture the image -->
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+
+    <!-- Button to take a snapshot -->
+    <button id="captureBtn">Capture</button>
+
+    <!-- Button to get recipe -->
+    <button id="recipeBtn">Recipe!</button>
+
+    <!-- Display captured image -->
+    <h3>Captured Image:</h3>
+    <img id="capturedImage" src="" alt="Captured Image" width="640">
+
+    <!-- Form to enter food name and send captured image -->
+    <h3>Add Food Item</h3>
+    <form id="foodForm">
+        <label for="foodName">Food Name:</label>
+        <input type="text" id="foodName" name="foodName" required>
+        <button type="button" id="sendBtn">Send</button>
+    </form>
+
+    <script>
+        // Access the camera and stream the video feed
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('captureBtn');
+        const capturedImage = document.getElementById('capturedImage');
+        const sendBtn = document.getElementById('sendBtn');
+        const foodNameInput = document.getElementById('foodName');
+
+        // Function to start video stream from the camera
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing the camera:', err);
+            }
+        }
+
+        // Function to capture the image from the video stream
+        function captureImage() {
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Get the data URL of the captured image
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Set the captured image to the img element
+            capturedImage.src = imageData;
+        }
+
+        // Function to send captured image and food name to the server
+        async function sendData() {
+            const foodName = foodNameInput.value;
+            const imageData = capturedImage.src;
+
+            if (!foodName || !imageData) {
+                alert('Please provide a food name and capture an image before sending.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/scan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: foodName,
+                        image: imageData,
+                    }),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                } else {
+                    alert('Error: ' + (result.error || 'Failed to send data.'));
+                }
+            } catch (err) {
+                console.error('Error sending data:', err);
+                alert('Error sending data to the server.');
+            }
+        }
+
+        // Start the camera when the page loads
+        startCamera();
+
+        // Set up the capture button to take the picture when clicked
+        captureBtn.addEventListener('click', captureImage);
+
+        // Set up the send button to send the data when clicked
+        sendBtn.addEventListener('click', sendData);
+    </script>
+
+    <h1>Food List with Random Numbers</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Food</th>
+                <th>Random Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for food, random_number in foods %}
+                <tr>
+                    <td>{{ food }}</td>
+                    <td>{{ random_number }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
