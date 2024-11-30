@@ -19,18 +19,27 @@ def connect_db():
     )
 
 def init_db():
-    """Initialize the PostgreSQL database with a table."""
+    """Drop and recreate the PostgreSQL database table."""
+    print("Dropping and recreating the table...")
     conn = connect_db()
     cursor = conn.cursor()
+    
+    # # Drop the table if it exists
+    # cursor.execute('DROP TABLE IF EXISTS foods;')
+    
+    # Create the table with the correct schema
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS foods (
         id SERIAL PRIMARY KEY,
         name TEXT,
+        when_added DATE DEFAULT CURRENT_DATE,
         expiration_date TEXT
-    )
+    );
     ''')
+    
     conn.commit()
     conn.close()
+
 
 def add_food(name, expiration_date):
     """Insert a new food item into the database."""
@@ -46,14 +55,15 @@ def get_all_foods(sort_by='date'):
     cursor = conn.cursor()
 
     if sort_by == 'expiration_date':
-        query = 'SELECT name, expiration_date FROM foods ORDER BY expiration_date ASC'
+        query = 'SELECT name, when_added, expiration_date FROM foods ORDER BY expiration_date ASC'
     else:  # Default to sorting by date added
-        query = 'SELECT name, expiration_date FROM foods ORDER BY id ASC'
+        query = 'SELECT name, when_added, expiration_date FROM foods ORDER BY when_added ASC'  # Sort by when_added column
     
     cursor.execute(query)
     foods = cursor.fetchall()
     conn.close()
     return foods
+
 
 def delete_food_by_name(name):
     """Delete a food item from the database by its name."""
