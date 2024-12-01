@@ -7,7 +7,7 @@
   <style>
   body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: url('/static/images/background.png') no-repeat center center fixed;
     background-size: cover;
     height: 100vh;
@@ -21,9 +21,9 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    width: 100%;
+    width: 200%;
     padding: 20px;
-    max-width: 100%; /* Prevents overflow */
+    max-width: 75%; 
     box-sizing: border-box;
   }
 
@@ -34,8 +34,8 @@
     border-radius: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 900px; /* Optional max-width for large screens */
-    height: 90%; /* Fill most of the page height */
+    max-width: 900px; 
+    height: 90%; 
     overflow: hidden;
   }
     .fridge-image {
@@ -47,7 +47,7 @@
 
     .content {
       padding: 20px;
-      width: 300px;
+      width: 700px;
     }
 
     .title {
@@ -55,47 +55,55 @@
       font-weight: bold;
       margin-bottom: 10px;
       text-align: center;
+      color: #507cad;
     }
 
     .date {
       font-size: 14px;
-      color: gray;
+      color: rgb(41, 37, 37);
       text-align: center;
       margin-bottom: 20px;
     }
 
     .tabs {
       display: flex;
-      justify-content: space-between;
+      justify-content: center; 
+      width: 100%;
       margin-bottom: 20px;
+      gap: 20px;
     }
 
     .tab {
       font-size: 14px;
       font-weight: bold;
       padding: 10px 15px;
-      border-radius: 5px;
+      border-radius: 15px;
       cursor: pointer;
-      background: #f0f0f0;
+      background: #ffffff;
       text-align: center;
+      display: inline-block;
     }
 
     .tab:hover {
-      background: #e0e0e0;
+      background: #e6e1e1;
     }
 
-    .inventory {
+    /*
+    calc(50% - 10px)
+    */
+
+    .inventory {     
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column; 
       gap: 10px;
     }
 
     .item {
-      background: #f9f9f9;
+      background: #ffffff;
       border: 1px solid #ddd;
       border-radius: 8px;
       padding: 10px;
-      width: calc(50% - 10px);
+      width: 100%;
       box-sizing: border-box;
       font-size: 14px;
     }
@@ -156,7 +164,7 @@
             const formattedDate = now.toLocaleString('en-US', options);
             return formattedDate;
           }
-        
+          <br /> 
           // Set the current date and time in the "date" div
           document.getElementById('currentDate').textContent = formatDateTime();
         </script>
@@ -174,8 +182,8 @@
             <option value="expiration_date" {% if sort_by == 'expiration_date' %}selected{% endif %}>Expiration Date</option>
         </select>
         
-        <div id="recipeResults" style="max-height: 500px; max-width: 800px; overflow: auto; border: 1px solid #ccc; padding: 10px;"></div>
-
+        
+        <br /> 
         <div class="inventory" id="inventory">
             {% for food, date, expiration, days_left in foods %}
             <div class="item">
@@ -187,12 +195,12 @@
             </div>
             {% endfor %}
           </div>
-
+          <br />  
          
 
           
           
-
+          <br /> 
           <div class="add-item-form" id="addItemForm">
 
             <div>
@@ -303,10 +311,6 @@
                 //console.log(output);
                 console.log(output.response);
                 if(output.response){
-                  const resultContainer=  document.getElementById('recipeResults');
-                  resultContainer.innerHTML = "";
-                  resultContainer.textContent = output.response;
-                  resultContainer.style.display = 'block';
                   downloadAsText(output.response);
                 } else{
                   console.log("Error!");
