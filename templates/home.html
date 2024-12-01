@@ -163,7 +163,7 @@
         <div class="tabs">
             <button class="tab" onclick="showInventory()">Inventory</button>
             <button class="tab" onclick="showAddItem()">Add Item</button>
-            <button class="tab" onclick="showAddItem()">Recipes</button>
+            <button class="tab" id ="recipeBtn" onclick="makeRecipe()">Recipes</button>
 
     
         </div>
@@ -174,6 +174,8 @@
             <option value="expiration_date" {% if sort_by == 'expiration_date' %}selected{% endif %}>Expiration Date</option>
         </select>
         
+        <div id="recipeResults" style="max-height: 500px; max-width: 800px; overflow: auto; border: 1px solid #ccc; padding: 10px;"></div>
+
         <div class="inventory" id="inventory">
             {% for food, date, expiration, days_left in foods %}
             <div class="item">
@@ -185,6 +187,9 @@
             </div>
             {% endfor %}
           </div>
+
+         
+
           
           
 
@@ -222,6 +227,7 @@
                     const video = document.getElementById('video');
                     const canvas = document.getElementById('canvas');
                     const captureBtn = document.getElementById('captureBtn');
+                    const recipeBtn = document.getElementById('recipeBtn');
                     const capturedImage = document.getElementById('capturedImage');
                     const sendBtn = document.getElementById('sendBtn');
                     const foodNameInput = document.getElementById('foodName');
@@ -241,10 +247,10 @@
                         const context = canvas.getContext('2d');
                         context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-                        // Get the data URL of the captured image
+                       
                         const imageData = canvas.toDataURL('image/png');
                         
-                        // Set the captured image to the img element
+                        
                         capturedImage.src = imageData;
                     }
             
@@ -281,14 +287,52 @@
                             alert('Error sending data to the server.');
                         }
                     }
+          async function makeRecipe(){
+            try{
+                const Recipe = await fetch('/recipe');
+                const preOutput = await Recipe.json();
+                //console.log(preOutput);
+
+                if(preOutput.error){
+                    alert(preOutput.error);
+                    return;
+                }
+                const aiResponse = await fetch(`https://weathered-frog-de80.vaibhavpanchanadam.workers.dev/?prompt=${preOutput.prompt}`);
+               // console.log(aiResponse);
+                const output = await aiResponse.json();
+                //console.log(output);
+                console.log(output.response);
+                if(output.response){
+                  const resultContainer=  document.getElementById('recipeResults');
+                  resultContainer.innerHTML = "";
+                  resultContainer.textContent = output.response;
+                  resultContainer.style.display = 'block';
+                  downloadAsText(output.response);
+                } else{
+                  console.log("Error!");
+                }
+                
+            }
+            catch(error){
+                console.log(error);
+                console.log("Error generating recipe");
+            }
+        }
+
+        function downloadAsText(info){
+          const blob = new Blob([info], {type: 'text/plain'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'saveYourFood.txt';
+          a.click();
+          URL.revokeObjectURL(url);
+
+        }
             
-                    // Start the camera when the page loads
+                    
                     startCamera();
-            
-                    // Set up the capture button to take the picture when clicked
                     captureBtn.addEventListener('click', captureImage);
-            
-                    // Set up the send button to send the data when clicked
                     sendBtn.addEventListener('click', sendData);
                 </script>
             </div>
@@ -296,15 +340,16 @@
           </div>
 
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
   <script>
     function showInventory() {
       document.getElementById('inventory').style.display = 'flex'; // Show inventory
-      document.getElementById('addItemForm').style.display = 'none'; // Hide add-item form
+      document.getElementById('addItemForm').style.display = 'none'; // Hide add-item
     }
 
     function showAddItem() {
-      document.getElementById('addItemForm').style.display = 'block'; // Show add-item form
+      document.getElementById('addItemForm').style.display = 'block'; // Show add-item 
       document.getElementById('inventory').style.display = 'none'; // Hide inventory
     }
 

@@ -57,7 +57,7 @@ def scan():
         image_file.write(image_bytes)
 
 
-    # Call your scan_image function (if required) and add to the database
+    
     expiration_date = scan_image(image_path)  # Process image to get expiration date
 
     if not expiration_date:
@@ -117,7 +117,7 @@ def top_expiring():
         return jsonify({'ERROR': 'no foods found'})
     
     food_names = [food[0] for food in foods]
-    prompt = "Give me 3 recipes with "+ ','.join(food_names)+" with their names, prep time and which kind of cuisines they are from."
+    prompt = "Give me 3 recipes with "+ ','.join(food_names)+" with their names, prep time and which kind of cuisines they are from. Try to be detailed with how to make it!"
     
 
     response = jsonify({
