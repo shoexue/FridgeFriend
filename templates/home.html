@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fridge Friend</title>
+  <style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('/static/images/background.png') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+    max-width: 100%; /* Prevents overflow */
+    box-sizing: border-box;
+  }
+
+  .fridge-container {
+    display: flex;
+    flex-direction: row;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 900px; /* Optional max-width for large screens */
+    height: 90%; /* Fill most of the page height */
+    overflow: hidden;
+  }
+    .fridge-image {
+      background: url('/static/images/Fridge.png') no-repeat center center;
+      background-size: contain;
+      width: 300px;
+      height: 400px;
+    }
+
+    .content {
+      padding: 20px;
+      width: 300px;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .date {
+      font-size: 14px;
+      color: gray;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      font-size: 14px;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #f0f0f0;
+      text-align: center;
+    }
+
+    .tab:hover {
+      background: #e0e0e0;
+    }
+
+    .inventory {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .item {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      width: calc(50% - 10px);
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    .item strong {
+      display: block;
+      font-weight: bold;
+    }
+
+    /* Media Query for scaling on smaller devices */
+    @media (max-width: 1200px) {
+      .container {
+        transform: scale(0.9);
+      }
+    }
+
+    @media (max-width: 992px) {
+      .container {
+        transform: scale(0.8);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        transform: scale(0.7);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .container {
+        transform: scale(0.6);
+      }
+    }
+  </style>
+</head>
+<body>
+
+      <div class="fridge-image"></div>
+      <div class="content">
+        <div class="title">Fridge Friend</div>
+        <div class="date" id="currentDate"></div>
+
+        <script>
+          // Function to format the date and time
+          function formatDateTime() {
+            const now = new Date();
+            const options = { 
+              weekday: 'short', 
+              year: 'numeric', 
+              month: 'short', 
+              day: 'numeric', 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              hour12: true 
+            };
+            
+            // Format date and time to the desired format
+            const formattedDate = now.toLocaleString('en-US', options);
+            return formattedDate;
+          }
+        
+          // Set the current date and time in the "date" div
+          document.getElementById('currentDate').textContent = formatDateTime();
+        </script>
+        <div class="tabs">
+            <button class="tab" onclick="showInventory()">Inventory</button>
+            <button class="tab" onclick="showAddItem()">Add Item</button>
+            <button class="tab" onclick="showAddItem()">Recipes</button>
+
+    
+        </div>
+        
+        <label for="sortBy">Sort By:</label>
+        <select id="sortBy" onchange="window.location.href = '/?sort_by=' + this.value">
+            <option value="date_added" {% if sort_by == 'date_added' %}selected{% endif %}>Date Added</option>
+            <option value="expiration_date" {% if sort_by == 'expiration_date' %}selected{% endif %}>Expiration Date</option>
+        </select>
+        
+        <div class="inventory" id="inventory">
+            {% for food, date, expiration, days_left in foods %}
+            <div class="item">
+              <strong>{{ food }}</strong>
+              Date added: {{ date }}<br>
+              Expires: {{ expiration }}
+              Days Until Expiration: {{ days_left }}
+
+            </div>
+            {% endfor %}
+          </div>
+          
+          
+
+          <div class="add-item-form" id="addItemForm">
+
+            <div>
+                <h2>Capture Image from Camera</h2>
+            
+                <!-- Video element to display live camera feed -->
+                <video id="video" width="210" height="160" autoplay></video>
+                
+                <!-- Canvas element to capture the image -->
+                <canvas id="canvas" width="210" height="160" style="display:none;"></canvas>
+            
+                <!-- Button to take a snapshot -->
+                <button id="captureBtn">Capture</button>
+            
+                <!-- Button to get recipe -->
+            
+                <!-- Display captured image -->
+                <h3>Captured Image:</h3>
+                <img id="capturedImage" src="" alt="Captured Image" width="210">
+            
+                <!-- Form to enter food name and send captured image -->
+                <h3>Add Food Item</h3>
+                <form id="foodForm">
+                    <label for="foodName">Food Name:</label>
+                    <input type="text" id="foodName" name="foodName" required>
+                    <button type="button" id="sendBtn">Send</button>
+                </form>
+            
+            
+                <script>
+                    // Access the camera and stream the video feed
+                    const video = document.getElementById('video');
+                    const canvas = document.getElementById('canvas');
+                    const captureBtn = document.getElementById('captureBtn');
+                    const capturedImage = document.getElementById('capturedImage');
+                    const sendBtn = document.getElementById('sendBtn');
+                    const foodNameInput = document.getElementById('foodName');
+            
+                    // Function to start video stream from the camera
+                    async function startCamera() {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                            video.srcObject = stream;
+                        } catch (err) {
+                            console.error('Error accessing the camera:', err);
+                        }
+                    }
+            
+                    // Function to capture the image from the video stream
+                    function captureImage() {
+                        const context = canvas.getContext('2d');
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+                        // Get the data URL of the captured image
+                        const imageData = canvas.toDataURL('image/png');
+                        
+                        // Set the captured image to the img element
+                        capturedImage.src = imageData;
+                    }
+            
+                    // Function to send captured image and food name to the server
+                    async function sendData() {
+                        const foodName = foodNameInput.value;
+                        const imageData = capturedImage.src;
+            
+                        if (!foodName || !imageData) {
+                            alert('Please provide a food name and capture an image before sending.');
+                            return;
+                        }
+            
+                        try {
+                            const response = await fetch('/scan', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    name: foodName,
+                                    image: imageData,
+                                }),
+                            });
+            
+                            const result = await response.json();
+                            if (response.ok) {
+                                alert(result.message);
+                            } else {
+                                alert('Error: ' + (result.error || 'Failed to send data.'));
+                            }
+                        } catch (err) {
+                            console.error('Error sending data:', err);
+                            alert('Error sending data to the server.');
+                        }
+                    }
+            
+                    // Start the camera when the page loads
+                    startCamera();
+            
+                    // Set up the capture button to take the picture when clicked
+                    captureBtn.addEventListener('click', captureImage);
+            
+                    // Set up the send button to send the data when clicked
+                    sendBtn.addEventListener('click', sendData);
+                </script>
+            </div>
+
+          </div>
+
+  </div>
+
+  <script>
+    function showInventory() {
+      document.getElementById('inventory').style.display = 'flex'; // Show inventory
+      document.getElementById('addItemForm').style.display = 'none'; // Hide add-item form
+    }
+
+    function showAddItem() {
+      document.getElementById('addItemForm').style.display = 'block'; // Show add-item form
+      document.getElementById('inventory').style.display = 'none'; // Hide inventory
+    }
+
+    // Show inventory by default on page load
+    window.onload = function () {
+      showInventory();
+    };
+  </script>
+
+</body>
+</html>

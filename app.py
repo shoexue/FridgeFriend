@@ -9,14 +9,35 @@ app = Flask(__name__)
 # Initialize the database
 init_db()
 
+from datetime import datetime
+
 @app.route('/')
 def index():
     """Render the table with all food data."""
-
+    
     sort_by = request.args.get('sort_by', 'date_added')  # Default to sorting by 'date_added' if no parameter is provided
     foods = get_all_foods(sort_by)
-
-    return render_template('index.html', foods=foods, sort_by=sort_by)
+    
+    # Calculate the days left until expiration for each food item
+    current_date = datetime.now()
+    
+    # Assuming each 'food' in 'foods' is a tuple with (food_name, date_added, expiration_date)
+    # Modify each item in 'foods' to include days_left
+    updated_foods = []
+    for food in foods:
+        food_name, date_added, expiration_date = food
+        
+        # Parse the expiration date (assuming it's in 'YYYY-MM-DD' format)
+        expiration_date_obj = datetime.strptime(expiration_date, '%Y-%m-%d')
+        
+        # Calculate days left until expiration
+        days_left = (expiration_date_obj - current_date).days
+        
+        # Add the days_left to the food tuple
+        updated_foods.append((food_name, date_added, expiration_date, days_left))
+    
+    # Render the updated list to the template
+    return render_template('home.html', foods=updated_foods, sort_by=sort_by)
 
 @app.route('/scan', methods=['POST'])
 def scan():
@@ -42,11 +63,10 @@ def scan():
     if not expiration_date:
         expiration_date = "Unknown"  # Default fallback value
         # Optionally log or notify the user about the failure
-        print(f"Failed to process expiration date for {food_name}. Defaulting to 'Unknown'.")
-        add_food(food_name, expiration_date)  # Add to the database
+        print(f"Failed to process expiration date for {food_name}")
 
         return jsonify({
-            'message': 'Food item added, but expiration date could not be determined.',
+            'message': 'expiration date could not be determined.',
             'name': food_name,
             'expiration_date': expiration_date
         }), 202  # HTTP 202 Accepted
