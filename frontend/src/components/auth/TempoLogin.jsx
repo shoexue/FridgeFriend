@@ -8,12 +8,10 @@ function Home() {
     // <div className="w-screen h-screen bg-white flex items-center justify-center p-4">
     <div>
     <div class="mb-4">
-        <EmailInput />
             
      </div>
     <div class="mb-6">
 
-        <PasswordInput />
         </div>
      </div>
   );
