@@ -305,7 +305,7 @@
                     alert(preOutput.error);
                     return;
                 }
-                const aiResponse = await fetch(`https://weathered-frog-de80.vaibhavpanchanadam.workers.dev/?prompt=${preOutput.prompt}`);
+                const aiResponse = await fetch(`https://?prompt=${preOutput.prompt}`);
                // console.log(aiResponse);
                 const output = await aiResponse.json();
                 //console.log(output);
